@@ -1,3 +1,5 @@
+#include "quantum.h"
+
 enum {
   TD_RESET = 0
 };
