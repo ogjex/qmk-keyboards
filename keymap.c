@@ -3,17 +3,6 @@ enum {
   TD_RESET = 0
 };
 
-void safe_reset(qk_tap_dance_state_t *state, void *user_data) {
-  if (state->count >= 3) {
-    // Reset the keyboard if you tap the key more than three times
-    reset_keyboard();
-    reset_tap_dance(state);
-  }
-}
-qk_tap_dance_action_t tap_dance_actions[] = {
-  [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset)
-};
-
 // define the various layers
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
@@ -71,10 +60,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------         ---------------------------------------------
     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
     // ----------------------------------------         ---------------------------------------------
-                                TO(0), KC_NO,         KC_NO, KC_NO
+                                TO(0), KC_NO,           KC_NO, KC_NO
 
   ),
 };
+
+void safe_reset(qk_tap_dance_state_t *state, void *user_data) {
+  if (state->count >= 3) {
+    // Reset the keyboard if you tap the key more than three times
+    reset_keyboard();
+    reset_tap_dance(state);
+  }
+}
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset)
+};
+
 
 #if defined(ENCODER_ENABLE) && defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
