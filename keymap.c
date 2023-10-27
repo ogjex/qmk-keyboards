@@ -27,10 +27,6 @@ int cur_dance (tap_dance_state_t *state);
 void ql_finished (tap_dance_state_t *state, void *user_data);
 void ql_reset (tap_dance_state_t *state, void *user_data);
 
-enum {
-
-};
-
 void safe_reset(tap_dance_state_t *state, void *user_data) {
   if (state->count >= 3) {
     // Reset the keyboard if you tap the key more than three times
@@ -41,7 +37,7 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
 
 // define the various layers
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT_KEYS(
+    [0] = LAYOUT(
     // Base key input layer--------------------         -----------------------------------------------
     KC_Q, KC_W, KC_E, KC_R, KC_T,                       KC_Y, KC_U, KC_I, KC_O, KC_P,
     //-----------------------------------------         -----------------------------------------------
@@ -53,7 +49,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
 
-    [1] = LAYOUT_SYM(
+    [1] = LAYOUT(
     // Signs and symbols layer, from layer 0---         ----------------------------------------------
     KC_ESC, KC_AT, KC_HASH, KC_DLR, KC_PERC,            KC_AMPR, KC_PSLS, KC_PIPE, KC_PMNS, KC_QUES,
     // ----------------------------------------         ----------------------------------------------
@@ -65,7 +61,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
 
-    [2] = LAYOUT_NUM(
+    [2] = LAYOUT(
     // Numpad layer, from layer 1--------------         ---------------------------------------------
     KC_ESC, KC_TRNS, KC_PSLS, KC_PAST, KC_PMNS,         KC_PEQL, KC_P7, KC_P8, KC_P9, KC_BSPC,
     // ----------------------------------------         ---------------------------------------------
@@ -77,7 +73,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
 
-    [3] = LAYOUT_NAV(
+    [3] = LAYOUT(
     // Navigation layer, from base layer 0-----         --------------------------------------------
     KC_ESC, KC_WH_L, KC_MS_U, KC_WH_R, KC_WH_U,         KC_NO, KC_NO, KC_NO, KC_NO, KC_BSPC,
     // ----------------------------------------         --------------------------------------------
@@ -88,7 +84,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 TO(0), KC_BTN2,         KC_BTN1, OSM(MOD_LCTL)
     ),
 
-    [4] = LAYOUT_FUNC(
+    [4] = LAYOUT(
     // Reset layer, from layer 3---------------         --------------------------------------------
     TD(TD_RESET), KC_NO, KC_NO, KC_NO, KC_NO,           KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
     // ----------------------------------------         ---------------------------------------------
@@ -102,7 +98,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 //Determine the current tap dance state
-int cur_dance (qk_tap_dance_state_t *state) {
+int cur_dance (tap_dance_state_t *state) {
   if (state->count == 1) {
     if (!state->pressed) {
       return SINGLE_TAP;
@@ -130,12 +126,12 @@ void ql_finished (tap_dance_state_t *state, void *user_data) {
       break;
     case DOUBLE_TAP:
       //check to see if the layer is already set
-      if (layer_state_is(LAYOUT_NUM)) {
+      if (layer_state_is(2)) {
         //if already set, then switch it off
-        layer_off(LAYOUT_NUM);
+        layer_off(2);
       } else {
         //if not already set, then switch the layer on
-        layer_on(LAYOUT_NUM);
+        layer_on(2);
       }
       break;
   }
@@ -144,7 +140,7 @@ void ql_finished (tap_dance_state_t *state, void *user_data) {
 void ql_reset (tap_dance_state_t *state, void *user_data) {
   //if the key was held down and now is released then switch off the layer
   if (ql_tap_state.state==DOUBLE_TAP) {
-    layer_off(LAYOUT_NUM);
+    layer_off(2);
   }
   ql_tap_state.state = 0;
 }
