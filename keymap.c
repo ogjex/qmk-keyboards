@@ -2,9 +2,8 @@
 
 enum {
   TD_RESET = 0,
-  TD_SCOLON_ENTER,
+  TD_SCOLON_ENTER
 };
-
 
 void safe_reset(tap_dance_state_t *state, void *user_data) {
   if (state->count >= 3) {
@@ -14,29 +13,9 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
   }
 }
 
-void dance_reset(tap_dance_state_t *state, void *user_data) {
-    // Reset any state if needed when the tap dance key is released.
-}
-
-tap_dance_action_t *tap_dance_actions[] = {
-    &tap_dance_actions[TD_SCOLON_ENTER],
-};
-
-void process_user_quantum_tap_dance(uint16_t keycode, keyrecord_t *record) {
-    tap_dance_action_t *action = tap_dance_actions[keycode];
-
-    if (record->event.pressed) {
-        // Key is pressed, start the tap dance
-        register_code(action->keycode);
-    } else {
-        // Key is released, end the tap dance
-        unregister_code(action->keycode);
-    }
-}
-
 tap_dance_action_t tap_dance_actions[] = {
   [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
-  [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_ENTER),
+  [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_ENTER)
 
 };
 
