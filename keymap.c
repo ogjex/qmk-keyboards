@@ -1,39 +1,14 @@
 #include QMK_KEYBOARD_H
 
 
-typedef struct {
-  bool is_press_action;
-  int state;
-} tap;
 
-//Define a type for as many tap dance states as you need
-enum {
-  SINGLE_TAP = 1,
-  DOUBLE_TAP = 2
-};
-
+ //Our custom tap dance key; add any other tap dance keys to this enum
 enum {
     TD_RESET = 0,
     TD_SCOLON_ENTER,
-    TD_DK_LAYR = 0     //Our custom tap dance key; add any other tap dance keys to this enum
+    TD_DK_LAYR = 0
 };
 
-//Declare the functions to be used with your tap dance key(s)
-
-//Function associated with all tap dances
-int cur_dance (tap_dance_state_t *state);
-
-//Functions associated with individual tap dances
-void ql_finished (tap_dance_state_t *state, void *user_data);
-void ql_reset (tap_dance_state_t *state, void *user_data);
-
-void safe_reset(tap_dance_state_t *state, void *user_data) {
-  if (state->count >= 3) {
-    // Reset the keyboard if you tap the key more than three times
-    reset_keyboard();
-    reset_tap_dance(state);
-  }
-}
 
 // define the various layers
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -43,7 +18,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //-----------------------------------------         -----------------------------------------------
     KC_A, KC_S, KC_D, KC_F, KC_G,                       KC_H, KC_J, KC_K, KC_L, TD(TD_SCOLON_ENTER),
     //-----------------------------------------         -----------------------------------------------
-    KC_Z, TD(TD_DK_LAYR), KC_C, KC_V, KC_DEL,                     KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
+    KC_Z, TD(TD_DK_LAYR), KC_C, KC_V, KC_DEL,           KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
     //-----------------------------------------         -----------------------------------------------
                         OSM(MOD_LSFT), KC_SPC,          OSL(1), OSM(MOD_LCTL)
     ),
@@ -97,19 +72,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-//Determine the current tap dance state
-int cur_dance (tap_dance_state_t *state) {
-  if (state->count == 1) {
-    if (!state->pressed) {
-      return SINGLE_TAP;
-    } else {
-      return SINGLE_HOLD;
-    }
-  } else if (state->count == 2) {
-    return DOUBLE_TAP;
-  }
-  else return 8;
-}
+typedef struct {
+  bool is_press_action;
+  int state;
+} tap;
+
+//Define a type for as many tap dance states as you need
+enum {
+    SINGLE_TAP = 1,
+    SINGLE_HOLD,
+    DOUBLE_TAP,
+    DOUBLE_HOLD,
+    DOUBLE_SINGLE_TAP,
+    MORE_TAPS};
 
 //Initialize tap structure associated with example tap dance key
 static tap ql_tap_state = {
@@ -117,21 +92,54 @@ static tap ql_tap_state = {
   .state = 0
 };
 
+//Declare the functions to be used with your tap dance key(s)
+
+//Function associated with all tap dances
+int cur_dance (tap_dance_state_t *state);
+
+//Functions associated with individual tap dances
+void ql_finished (tap_dance_state_t *state, void *user_data);
+void ql_reset (tap_dance_state_t *state, void *user_data);
+
+void safe_reset(tap_dance_state_t *state, void *user_data) {
+  if (state->count >= 3) {
+    // Reset the keyboard if you tap the key more than three times
+    reset_keyboard();
+    reset_tap_dance(state);
+  }
+}
+//Determine the current tap dance state
+int cur_dance (tap_dance_state_t *state) {
+  if (state->count == 1) {
+		if (state->interrupted || !state->pressed) return SINGLE_TAP;
+		else return SINGLE_HOLD;
+	} else if (state->count == 2) {
+		if (state->interrupted) return DOUBLE_SINGLE_TAP;
+		else if (state->pressed) return DOUBLE_HOLD;
+		else return DOUBLE_TAP;
+	}
+	return MORE_TAPS;
+}
+
 //Functions that control what our tap dance key does
 void ql_finished (tap_dance_state_t *state, void *user_data) {
   ql_tap_state.state = cur_dance(state);
   switch (ql_tap_state.state) {
     case SINGLE_TAP:
       tap_code(KC_X);
+      SEND_STRING("X has been typed, you tapped once!");
       break;
     case DOUBLE_TAP:
       //check to see if the layer is already set
       if (layer_state_is(2)) {
         //if already set, then switch it off
         layer_off(2);
+         SEND_STRING("QMK layer turned off!");
       } else {
         //if not already set, then switch the layer on
         layer_on(2);
+
+        SEND_STRING("QMK layer turned on, you tapped twice");
       }
       break;
   }
@@ -139,7 +147,7 @@ void ql_finished (tap_dance_state_t *state, void *user_data) {
 
 void ql_reset (tap_dance_state_t *state, void *user_data) {
   //if the key was held down and now is released then switch off the layer
-  if (ql_tap_state.state==DOUBLE_TAP) {
+  if (ql_tap_state.state==SINGLE_HOLD) {
     layer_off(2);
   }
   ql_tap_state.state = 0;
@@ -149,7 +157,7 @@ void ql_reset (tap_dance_state_t *state, void *user_data) {
 tap_dance_action_t tap_dance_actions[] = {
   [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
   [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_ENTER),
-  [TD_DK_LAYR] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ql_finished, ql_reset, 275)
+  [TD_DK_LAYR] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ql_finished, ql_reset)
 };
 
 
