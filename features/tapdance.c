@@ -52,9 +52,6 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
         case TD_DOUBLE_HOLD:
             SEND_STRING("key held twice");
             break;
-        case TD_TRIPLE_TAP:
-            SEND_STRING("key tapped thrice");
-            break;
         default:
             break;
     }
@@ -62,31 +59,6 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
 
 
 // old code from here
-
-typedef struct {
-  bool is_press_action;
-  int state;
-} tap;
-
-//Define a type for as many tap dance states as you need
-enum {
-    SINGLE_TAP = 1,
-    SINGLE_HOLD,
-    DOUBLE_TAP,
-    DOUBLE_HOLD,
-    DOUBLE_SINGLE_TAP,
-    MORE_TAPS};
-
-//Initialize tap structure associated with example tap dance key
-static tap ql_tap_state = {
-  .is_press_action = true,
-  .state = 0
-};
-
-//Declare the functions to be used with your tap dance key(s)
-
-//Function associated with all tap dances
-int cur_dance (tap_dance_state_t *state);
 
 //Functions associated with individual tap dances
 void ql_finished (tap_dance_state_t *state, void *user_data);
@@ -99,8 +71,6 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
     reset_tap_dance(state);
   }
 }
-
-
 
 //Functions that control what our tap dance key does
 void ql_finished (tap_dance_state_t *state, void *user_data) {
@@ -138,7 +108,9 @@ void ql_reset (tap_dance_state_t *state, void *user_data) {
 tap_dance_action_t tap_dance_actions[] = {
   [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
   [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_ENTER),
+  [TD_TEST_STRING] = ACTION_TAP_DANCE_FN(td_send_success_strings),
   [TD_DK_LAYR] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ql_finished, ql_reset)
+
 };
 
 
