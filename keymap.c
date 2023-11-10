@@ -149,6 +149,9 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
         case TD_TRIPLE_TAP:
             SEND_STRING("key tapped thrice");
             break;
+        case TD_TRIPLE_HOLD:
+            SEND_STRING("key held thrice");
+            break;
         default:
             break;
     }
