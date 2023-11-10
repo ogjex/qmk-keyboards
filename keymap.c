@@ -130,7 +130,7 @@ __attribute__((weak)) td_state_t dance_state(tap_dance_state_t *state) {
         return TD_UNKNOWN;
 }
 
-// example of a tap dance function structure
+// example of a full tap dance function structure
 void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
@@ -157,17 +157,23 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
     }
 }
 
-// old code from here
-
+// enable keyboard reset key
 void safe_reset(tap_dance_state_t *state, void *user_data) {
-  if (state->count >= 3) {
-    // Reset the keyboard if you tap the key more than three times
-    reset_keyboard();
-    reset_tap_dance(state);
-  }
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_TRIPLE_HOLD:
+            reset_keyboard();
+            reset_tap_dance(state);
+            SEND_STRING("keyboard should be reset now");
+            break;
+        default:
+            break;
+    }
 }
 
-//Functions that control what our tap dance key does
+// old code from here
+
+// old function that switches layers
 void ql_finished (tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
