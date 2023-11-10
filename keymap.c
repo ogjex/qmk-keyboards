@@ -1,10 +1,12 @@
 #include "action.h"
+#include "action_code.h"
 #include "keycodes.h"
 #include QMK_KEYBOARD_H
 
 #include "features/tapdance.h"
 #include "definitions/keycodes.h"
 
+// Define our tap dance states
 typedef enum {
     TD_NONE,
     TD_UNKNOWN,
@@ -75,9 +77,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------         --------------------------------------------
     KC_TAB, KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,         KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_ENT,
     // ----------------------------------------         --------------------------------------------
-    KC_NO, KC_BTN2, KC_LGUI, KC_LALT, KC_DEL,           KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
+    KC_BTN2, KC_CUT, KC_COPY, KC_PASTE, KC_DEL,           KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------         --------------------------------------------
-                                TO(0), KC_BTN2,         KC_BTN1, OSM(MOD_LCTL)
+                            TO(0), OSM(MOD_LSFT),         KC_BTN1, OSM(MOD_LCTL)
     ),
 
     [4] = LAYOUT(
@@ -163,15 +165,36 @@ void td_delete(tap_dance_state_t *state, void *user_data) {
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
             tap_code(KC_DEL);
-            SEND_STRING("del key tapped once");
+
             break;
         case TD_SINGLE_HOLD:
             SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_DEL) SS_UP(X_LCTL));
-            SEND_STRING("del key held once");
+
             break;
         case TD_DOUBLE_HOLD:
             SEND_STRING(SS_DOWN(X_LSFT) SS_DOWN(X_END) SS_TAP(X_DEL) SS_UP(X_LSFT) SS_UP(X_END));
-            SEND_STRING("del key held twice");
+
+            break;
+        default:
+            break;
+    }
+}
+
+// defining delete key macro
+void td_delete(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_DEL);
+
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_DEL) SS_UP(X_LCTL));
+
+            break;
+        case TD_DOUBLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LSFT) SS_DOWN(X_END) SS_TAP(X_DEL) SS_UP(X_LSFT) SS_UP(X_END));
+
             break;
         default:
             break;
