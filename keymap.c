@@ -1,3 +1,4 @@
+#include "keycodes.h"
 #include QMK_KEYBOARD_H
 
 #include "features/tapdance.h"
@@ -28,9 +29,6 @@ enum {
     TD_TEST_STRING
 };
 
-td_state_t dance_state(tap_dance_state_t *state);
-
-
 // define the various layers
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
@@ -39,7 +37,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //-----------------------------------------         -----------------------------------------------
     KC_A, KC_S, KC_D, KC_F, KC_G,                       KC_H, KC_J, KC_K, KC_L, TD(TD_SCOLON_ENTER),
     //-----------------------------------------         -----------------------------------------------
-    KC_Z, TD(TD_DK_LAYR), KC_C, KC_V, KC_DEL,           KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
+    KC_Z, KC_X , KC_C, KC_V, KC_DEL,           KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
     //-----------------------------------------         -----------------------------------------------
                         OSM(MOD_LSFT), KC_SPC,          OSL(1), OSM(MOD_LCTL)
     ),
@@ -82,7 +80,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [4] = LAYOUT(
     // Reset layer, from layer 3---------------         --------------------------------------------
-    TD(TD_RESET), KC_NO, KC_NO, KC_NO, KC_NO,           KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+    TD(TD_RESET), KC_Q, KC_NO, KC_NO, KC_NO,           KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
     // ----------------------------------------         ---------------------------------------------
     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
     // ----------------------------------------         ---------------------------------------------
@@ -161,10 +159,10 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
 void safe_reset(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
-        case TD_TRIPLE_HOLD:
+        case TD_SINGLE_HOLD:
+            SEND_STRING("keyboard should be reset now");
             reset_keyboard();
             reset_tap_dance(state);
-            SEND_STRING("keyboard should be reset now");
             break;
         default:
             break;
@@ -173,47 +171,11 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
 
 // old code from here
 
-// old function that switches layers
-void ql_finished (tap_dance_state_t *state, void *user_data) {
-    tap_state.state = dance_state(state);
-    switch (tap_state.state) {
-    case TD_SINGLE_TAP:
-      tap_code(KC_X);
-      SEND_STRING("X has been typed, you tapped once!");
-      break;
-    case TD_DOUBLE_TAP:
-      //check to see if the layer is already set
-      if (layer_state_is(2)) {
-        //if already set, then switch it off
-        layer_off(2);
-         SEND_STRING("QMK layer turned off!");
-      } else {
-        //if not already set, then switch the layer on
-        layer_on(2);
-
-        SEND_STRING("QMK layer turned on, you tapped twice");
-      }
-      break;
-    default:
-      break;
-  }
-}
-
-void ql_reset (tap_dance_state_t *state, void *user_data) {
-  //if the key was held down and now is released then switch off the layer
-  if (tap_state.state==TD_SINGLE_HOLD) {
-    layer_off(2);
-  }
-  tap_state.state = 0;
-}
-
-
 //Associate our tap dance key with its functionality
 tap_dance_action_t tap_dance_actions[] = {
   [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
-  [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_ENTER),
-  [TD_TEST_STRING] = ACTION_TAP_DANCE_FN(td_send_success_strings),
-  [TD_DK_LAYR] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ql_finished, ql_reset)
+  [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_Q, KC_SCLN),
+  [TD_TEST_STRING] = ACTION_TAP_DANCE_FN(td_send_success_strings)
 
 };
 
