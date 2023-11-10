@@ -1,3 +1,4 @@
+#include "action.h"
 #include "keycodes.h"
 #include QMK_KEYBOARD_H
 
@@ -26,7 +27,8 @@ enum {
     TD_RESET = 0,
     TD_SCOLON_ENTER,
     TD_DK_LAYR = 0,
-    TD_TEST_STRING
+    TD_TEST_STRING,
+    TD_DELETE
 };
 
 // define the various layers
@@ -37,7 +39,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //-----------------------------------------         -----------------------------------------------
     KC_A, KC_S, KC_D, KC_F, KC_G,                       KC_H, KC_J, KC_K, KC_L, TD(TD_SCOLON_ENTER),
     //-----------------------------------------         -----------------------------------------------
-    KC_Z, KC_X , KC_C, KC_V, KC_DEL,           KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
+    KC_Z, KC_X , KC_C, KC_V, TD(TD_DELETE),           KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
     //-----------------------------------------         -----------------------------------------------
                         OSM(MOD_LSFT), KC_SPC,          OSL(1), OSM(MOD_LCTL)
     ),
@@ -61,7 +63,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------         ---------------------------------------------
     KC_TAB, KC_NO, KC_NO, KC_NO, KC_PPLS,               KC_PERC, KC_4, KC_5, KC_6, KC_ENT,
     // ----------------------------------------         ---------------------------------------------
-    KC_LSFT, KC_LCTL, KC_LGUI, KC_LALT, KC_DEL,         KC_0, KC_1, KC_2, KC_3, KC_PEQL,
+    KC_LSFT, KC_LCTL, KC_LGUI, KC_LALT, TD(TD_DELETE),         KC_0, KC_1, KC_2, KC_3, KC_PEQL,
     // ----------------------------------------         ---------------------------------------------
                                 TO(0), KC_TRNS,         TO(4), KC_TRNS
     ),
@@ -155,6 +157,27 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+// defining delete key macro
+void td_delete(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_DEL);
+            SEND_STRING("del key tapped once");
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_DEL) SS_UP(X_LCTL));
+            SEND_STRING("del key held once");
+            break;
+        case TD_DOUBLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LSFT) SS_DOWN(X_END) SS_TAP(X_DEL) SS_UP(X_LSFT) SS_UP(X_END));
+            SEND_STRING("del key held twice");
+            break;
+        default:
+            break;
+    }
+}
+
 // enable keyboard reset key
 void safe_reset(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
@@ -169,15 +192,17 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
     }
 }
 
-// old code from here
 
 //Associate our tap dance key with its functionality
 tap_dance_action_t tap_dance_actions[] = {
   [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
+  [TD_DELETE] = ACTION_TAP_DANCE_FN(td_delete),
   [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_Q, KC_SCLN),
   [TD_TEST_STRING] = ACTION_TAP_DANCE_FN(td_send_success_strings)
 
 };
+
+// old code from here
 
 // -------------------------------------------------------------------------------------
 // ONESHOT MOD INITIALISATION
