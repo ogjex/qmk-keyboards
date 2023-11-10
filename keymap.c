@@ -26,11 +26,10 @@ typedef struct {
 
  //Our custom tap dance keys; add any other tap dance keys to this enum
 enum {
-    TD_RESET = 0,
+    TD_RESET,
+    TD_DELETE,
     TD_AE_ENTER,
-    TD_DK_LAYR = 0,
     TD_TEST_STRING,
-    TD_DELETE
 };
 
 // define the various layers
@@ -45,7 +44,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //-----------------------------------------         -----------------------------------------------
                         OSM(MOD_LSFT), KC_SPC,          OSL(1), OSM(MOD_LCTL)
     ),
-
 
     [1] = LAYOUT(
     // Signs and symbols layer, from layer 0---         ----------------------------------------------
@@ -100,9 +98,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // -------------------------------------------------------------------------------------
 // initiate handlers to define the types of taps
 
+td_state_t dance_state(tap_dance_state_t *state);
+
 static td_tap_t tap_state = {.state = TD_NONE};
 
-__attribute__((weak)) td_state_t dance_state(tap_dance_state_t *state) {
+td_state_t dance_state(tap_dance_state_t *state) {
     if (state->count == 1) {
         if (state->interrupted || !state->pressed) return TD_SINGLE_TAP;
         // Key has not been interrupted, but the key is still held. Means you want to send a 'HOLD'.
@@ -167,7 +167,22 @@ void td_aa(tap_dance_state_t *state, void *user_data) {
             tap_code(KC_A);
             break;
         case TD_SINGLE_HOLD:
-            tap_code(KC_A);
+            tap_code(KC_LBRC);
+            break;
+        default:
+            break;
+    }
+}
+
+// defining temporary ø
+void td_oe_enter(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_O);
+            break;
+        case TD_SINGLE_HOLD:
+            tap_code(KC_LQUOT);
             break;
         default:
             break;
@@ -185,10 +200,10 @@ void td_ae_enter(tap_dance_state_t *state, void *user_data) {
             tap_code(KC_ENT);
             break;
         default:
+            reset_tap_dance(state);
             break;
     }
 }
-
 
 // defining delete key macro
 void td_delete(tap_dance_state_t *state, void *user_data) {
@@ -211,6 +226,27 @@ void td_delete(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+// defining backspace key macro
+void td_bspace(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_BSPC);
+
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_BSPC) SS_UP(X_LCTL));
+
+            break;
+        case TD_DOUBLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LSFT) SS_DOWN(X_HOME) SS_TAP(X_BSPC) SS_UP(X_LSFT) SS_UP(X_HOME));
+
+            break;
+        default:
+            break;
+    }
+}
+
 // enable keyboard reset key
 void safe_reset(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
@@ -218,7 +254,39 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_HOLD:
             SEND_STRING("keyboard should be reset now");
             reset_keyboard();
-            reset_tap_dance(state);
+            break;
+        default:
+            break;
+    }
+}
+
+// defining tab switcher tapdance key
+void td_tabswitch(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_TAB) SS_UP(X_LALT));
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_TAB) SS_UP(X_LGUI));
+
+            break;
+        default:
+            break;
+    }
+}
+
+// defining home tapdance key
+void td_bspace(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_HOME);
+
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_BSPC) SS_UP(X_LCTL));
+
             break;
         default:
             break;
