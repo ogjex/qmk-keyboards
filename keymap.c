@@ -277,7 +277,7 @@ void td_tabswitch(tap_dance_state_t *state, void *user_data) {
 }
 
 // defining home tapdance key
-void td_bspace(tap_dance_state_t *state, void *user_data) {
+void td_home(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
