@@ -27,7 +27,7 @@ typedef struct {
  //Our custom tap dance keys; add any other tap dance keys to this enum
 enum {
     TD_RESET = 0,
-    TD_SCOLON_ENTER,
+    TD_AE_ENTER,
     TD_DK_LAYR = 0,
     TD_TEST_STRING,
     TD_DELETE
@@ -39,7 +39,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Base key input layer--------------------         -----------------------------------------------
     TD(TD_TEST_STRING), KC_W, KC_E, KC_R, KC_T,         KC_Y, KC_U, KC_I, KC_O, KC_P,
     //-----------------------------------------         -----------------------------------------------
-    KC_A, KC_S, KC_D, KC_F, KC_G,                       KC_H, KC_J, KC_K, KC_L, TD(TD_SCOLON_ENTER),
+    KC_A, KC_S, KC_D, KC_F, KC_G,                       KC_H, KC_J, KC_K, KC_L, TD(TD_AE_ENTER),
     //-----------------------------------------         -----------------------------------------------
     KC_Z, KC_X , KC_C, KC_V, TD(TD_DELETE),           KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
     //-----------------------------------------         -----------------------------------------------
@@ -159,26 +159,36 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
     }
 }
 
-// defining delete key macro
-void td_delete(tap_dance_state_t *state, void *user_data) {
+// defining DK å
+void td_aa(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
-            tap_code(KC_DEL);
-
+            tap_code(KC_A);
             break;
         case TD_SINGLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_DEL) SS_UP(X_LCTL));
-
-            break;
-        case TD_DOUBLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LSFT) SS_DOWN(X_END) SS_TAP(X_DEL) SS_UP(X_LSFT) SS_UP(X_END));
-
+            tap_code(KC_A);
             break;
         default:
             break;
     }
 }
+
+// defining ae and enter tapdance
+void td_ae_enter(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_SCLN);
+            break;
+        case TD_DOUBLE_TAP:
+            tap_code(KC_ENT);
+            break;
+        default:
+            break;
+    }
+}
+
 
 // defining delete key macro
 void td_delete(tap_dance_state_t *state, void *user_data) {
@@ -220,7 +230,7 @@ void safe_reset(tap_dance_state_t *state, void *user_data) {
 tap_dance_action_t tap_dance_actions[] = {
   [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
   [TD_DELETE] = ACTION_TAP_DANCE_FN(td_delete),
-  [TD_SCOLON_ENTER] = ACTION_TAP_DANCE_DOUBLE(KC_Q, KC_SCLN),
+  [TD_AE_ENTER] = ACTION_TAP_DANCE_FN(td_ae_enter),
   [TD_TEST_STRING] = ACTION_TAP_DANCE_FN(td_send_success_strings)
 
 };
