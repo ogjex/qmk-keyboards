@@ -93,7 +93,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-
+// -------------------------------------------------------------------------------------
+// TAP DANCE INITIALISATION
+// -------------------------------------------------------------------------------------
 // initiate handlers to define the types of taps
 
 static td_tap_t tap_state = {.state = TD_NONE};
@@ -144,11 +146,13 @@ void td_send_success_strings(tap_dance_state_t *state, void *user_data) {
         case TD_DOUBLE_HOLD:
             SEND_STRING("key held twice");
             break;
+        case TD_TRIPLE_TAP:
+            SEND_STRING("key tapped thrice");
+            break;
         default:
             break;
     }
 }
-
 
 // old code from here
 
@@ -204,7 +208,13 @@ tap_dance_action_t tap_dance_actions[] = {
 
 };
 
+// -------------------------------------------------------------------------------------
+// ONESHOT MOD INITIALISATION
+// -------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------
+// MACRO INITIALISATION
+// -------------------------------------------------------------------------------------
 
 #if defined(ENCODER_ENABLE) && defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
