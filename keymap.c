@@ -185,14 +185,14 @@ void td_aa(tap_dance_state_t *state, void *user_data) {
 }
 
 // defining temporary ø
-void td_oe_enter(tap_dance_state_t *state, void *user_data) {
+void td_oe(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
             tap_code(KC_O);
             break;
         case TD_SINGLE_HOLD:
-            tap_code(KC_LQUOT);
+            tap_code(KC_QUOT);
             break;
         default:
             break;
@@ -337,7 +337,7 @@ void td_esc_tm(tap_dance_state_t *state, void *user_data) {
 }
 
 // defining previous tab tapdance key
-void td_next_tab(tap_dance_state_t *state, void *user_data) {
+void td_prev_tab(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
