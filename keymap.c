@@ -58,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [1] = LAYOUT(
     // Signs and symbols layer, from layer 0---         ----------------------------------------------
-    TD(TD_ESC), KC_AT, KC_HASH, KC_DLR, KC_PERC,        KC_AMPR, KC_PSLS, KC_PIPE, KC_PMNS, KC_QUES,
+    TD(TD_ESC_TM), KC_AT, KC_HASH, KC_DLR, KC_PERC,        KC_AMPR, KC_PSLS, KC_PIPE, KC_PMNS, KC_QUES,
     // ----------------------------------------         ----------------------------------------------
     TD(TD_APP_TAB), KC_CIRC, KC_AT, KC_QUOT, KC_PIPE,   KC_EXLM, KC_ASTR, KC_LPRN, KC_QUES, KC_ENT,
     // ----------------------------------------         ----------------------------------------------
