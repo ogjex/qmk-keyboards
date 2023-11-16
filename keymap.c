@@ -28,6 +28,21 @@ typedef struct {
     bool       recording;
 } td_tap_t;
 
+typedef struct {
+  bool is_press_action;
+  int state;
+} tap;
+
+// define alttap state for oneshot functions
+static tap alttap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+// declare variables to be used
+static td_tap_t tap_state = {.state = TD_NONE};
+
+
  //Our custom tap dance keys; add any other tap dance keys to this enum
 enum {
     TD_RESET,
@@ -44,7 +59,8 @@ enum {
     TD_END_N,
     TD_ESC_TM,
     TD_NEXT_T,
-    TD_PREV_T
+    TD_PREV_T,
+    ALT_OSL1
 };
 
 // define the various layers
@@ -112,9 +128,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // -------------------------------------------------------------------------------------
 // initiate handlers to define the types of taps
 
-td_state_t dance_state(tap_dance_state_t *state);
+// declare functions to be defined later
 
-static td_tap_t tap_state = {.state = TD_NONE};
+td_state_t dance_state(tap_dance_state_t *state);
+void alt_finished (tap_dance_state_t *state, void *user_data);
+void alt_reset (tap_dance_state_t *state, void *user_data);
 
 td_state_t dance_state(tap_dance_state_t *state) {
     if (state->count == 1) {
@@ -395,6 +413,54 @@ void td_end_next(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+// Defining oneshot layer functions
+
+void alt_finished (tap_dance_state_t *state, void *user_data) {
+  alttap_state.state = dance_state(state);
+  switch (alttap_state.state) {
+    case SINGLE_TAP: set_oneshot_layer(1, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
+    case SINGLE_HOLD: register_code(KC_LALT); break;
+    case DOUBLE_TAP: set_oneshot_layer(1, ONESHOT_START); set_oneshot_layer(1, ONESHOT_PRESSED); break;
+    case DOUBLE_HOLD: register_code(KC_LALT); layer_on(1); break;
+    //Last case is for fast typing. Assuming your key is `f`:
+    //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
+    //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
+  }
+}
+
+void alt_reset (tap_dance_state_t *state, void *user_data) {
+  switch (alttap_state.state) {
+    case SINGLE_TAP: break;
+    case SINGLE_HOLD: unregister_code(KC_LALT); break;
+    case DOUBLE_TAP: break;
+    case DOUBLE_HOLD: layer_off(1); unregister_code(KC_LALT); break;
+  }
+  alttap_state.state = 0;
+}
+
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+
+  switch (keycode) {
+    case KC_TRNS:
+    case KC_NO:
+      /* Always cancel one-shot layer when another key gets pressed */
+      if (record->event.pressed && is_oneshot_layer_active())
+      clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
+      return true;
+    case RESET:
+      /* Don't allow reset from oneshot layer state */
+      if (record->event.pressed && is_oneshot_layer_active()){
+        clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
+        return false;
+      }
+      return true;
+    default:
+      return true;
+  }
+  return true;
+}
+
+
 //Associate our tap dance key with its functionality
 tap_dance_action_t tap_dance_actions[] = {
     [TD_RESET] = ACTION_TAP_DANCE_FN(safe_reset),
@@ -411,7 +477,8 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_END_N] = ACTION_TAP_DANCE_FN(td_end_next),
     [TD_ESC_TM] = ACTION_TAP_DANCE_FN(td_esc_tm),
     [TD_NEXT_T] = ACTION_TAP_DANCE_FN(td_next_tab),
-    [TD_PREV_T] = ACTION_TAP_DANCE_FN(td_prev_tab)
+    [TD_PREV_T] = ACTION_TAP_DANCE_FN(td_prev_tab),
+    [ALT_OSL1]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset)
 };
 
 // old code from here
