@@ -6,10 +6,6 @@
 #include "features/tapdance.h"
 #include "definitions/keycodes.h"
 
-#define KC_CUT LCTL(KC_X)
-#define KC_COPY LCTL(KC_C)
-#define KC_PASTE LCTL(KC_V)
-
 // Define our tap dance states
 typedef enum {
     TD_NONE,
@@ -105,14 +101,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------                         --------------------------------------------
     TD(TD_APP_TAB), KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,                 TD(TD_LSKIP), KC_DOWN, KC_UP, TD(TD_RSKIP), KC_ENT,
     // ----------------------------------------                         --------------------------------------------
-    KC_BTN2, KC_CUT, KC_COPY, KC_PASTE, KC_DEL,                         KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
+    KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), KC_DEL,                KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------                         --------------------------------------------
                             TO(0), OSM(MOD_LSFT),                       KC_BTN1, OSM(MOD_LCTL)
     ),
 
     [4] = LAYOUT(
     // Reset layer, from layer 3---------------                         --------------------------------------------
-    TD(TD_RESET), KC_Q, KC_NO, KC_NO, KC_NO,                            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+    QK_BOOTLOADER, KC_Q, KC_NO, KC_NO, KC_NO,                            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
     // ----------------------------------------                         ---------------------------------------------
     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
     // ----------------------------------------                         ---------------------------------------------
@@ -418,10 +414,10 @@ void td_end_next(tap_dance_state_t *state, void *user_data) {
 void alt_finished (tap_dance_state_t *state, void *user_data) {
   alttap_state.state = dance_state(state);
   switch (alttap_state.state) {
-    case SINGLE_TAP: set_oneshot_layer(1, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
-    case SINGLE_HOLD: register_code(KC_LALT); break;
-    case DOUBLE_TAP: set_oneshot_layer(1, ONESHOT_START); set_oneshot_layer(1, ONESHOT_PRESSED); break;
-    case DOUBLE_HOLD: register_code(KC_LALT); layer_on(1); break;
+    case TD_SINGLE_TAP: set_oneshot_layer(1, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
+    case TD_SINGLE_HOLD: register_code(KC_LALT); break;
+    case TD_DOUBLE_TAP: set_oneshot_layer(1, ONESHOT_START); set_oneshot_layer(1, ONESHOT_PRESSED); break;
+    case TD_DOUBLE_HOLD: register_code(KC_LALT); layer_on(1); break;
     //Last case is for fast typing. Assuming your key is `f`:
     //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
     //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
@@ -430,10 +426,10 @@ void alt_finished (tap_dance_state_t *state, void *user_data) {
 
 void alt_reset (tap_dance_state_t *state, void *user_data) {
   switch (alttap_state.state) {
-    case SINGLE_TAP: break;
-    case SINGLE_HOLD: unregister_code(KC_LALT); break;
-    case DOUBLE_TAP: break;
-    case DOUBLE_HOLD: layer_off(1); unregister_code(KC_LALT); break;
+    case TD_SINGLE_TAP: break;
+    case TD_SINGLE_HOLD: unregister_code(KC_LALT); break;
+    case TD_DOUBLE_TAP: break;
+    case TD_DOUBLE_HOLD: layer_off(1); unregister_code(KC_LALT); break;
   }
   alttap_state.state = 0;
 }
@@ -447,7 +443,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed && is_oneshot_layer_active())
       clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
       return true;
-    case RESET:
+    case QK_BOOTLOADER:
       /* Don't allow reset from oneshot layer state */
       if (record->event.pressed && is_oneshot_layer_active()){
         clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
