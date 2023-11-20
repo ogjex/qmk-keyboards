@@ -328,10 +328,10 @@ void td_apptab_switch(tap_dance_state_t *state, void *user_data) {
             tap_code(KC_TAB);
             break;
         case TD_SINGLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_TAB));
+            SEND_STRING(SS_TAP(X_LALT) SS_TAP(X_TAB) SS_TAP(X_LCTL));
             break;
         case TD_DOUBLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_TAB));
+            SEND_STRING(SS_TAP(X_LGUI) SS_TAP(X_TAB));
 
             break;
         default:
@@ -429,7 +429,7 @@ void alt_reset (tap_dance_state_t *state, void *user_data) {
     case TD_SINGLE_TAP: break;
     case TD_SINGLE_HOLD: unregister_code(KC_LALT); break;
     case TD_DOUBLE_TAP: break;
-    case TD_DOUBLE_HOLD: layer_off(1); unregister_code(KC_LALT); break;
+    case TD_DOUBLE_HOLD: layer_off(0); unregister_code(KC_LALT); break;
   }
   alttap_state.state = 0;
 }
