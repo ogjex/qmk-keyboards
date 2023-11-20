@@ -70,7 +70,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //-----------------------------------------                         -----------------------------------------------
     KC_Z, KC_X , KC_C, KC_V, TD(TD_DELETE),                             KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
     //-----------------------------------------                         -----------------------------------------------
-                        OSM(MOD_LGUI), KC_SPC,                          OSL(1), TD(TD_OSM_SCAW)
+                        OSM(MOD_LSFT), KC_SPC,                          OSL(1), TD(TD_OSM_SCAW)
     ),
 
     [1] = LAYOUT(
@@ -333,13 +333,23 @@ void td_apptab_switch(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_TAP:
             tap_code(KC_TAB);
             break;
+        case TD_DOUBLE_TAP:
+            tap_code(KC_TAB);
+            tap_code(KC_TAB);
+            break;
+        case TD_TRIPLE_TAP:
+            tap_code(KC_TAB);
+            tap_code(KC_TAB);
+            tap_code(KC_TAB);
+            break;
         case TD_SINGLE_HOLD:
             SEND_STRING(SS_DOWN(X_LALT) SS_DOWN(X_LCTL) SS_TAP(X_TAB) SS_UP(X_LALT) SS_UP(X_LCTL) );
             break;
         case TD_DOUBLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_TAB) SS_UP(X_LCTL));
+        break;
+        case TD_TRIPLE_HOLD:
             SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_TAB) SS_UP(X_LGUI));
-
-            break;
         default:
             break;
     }
