@@ -245,7 +245,6 @@ void td_left_skip(tap_dance_state_t *state, void *user_data) {
             SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_LEFT) SS_UP(X_LCTL));
             break;
         default:
-            reset_tap_dance(state);
             break;
     }
 }
@@ -261,7 +260,6 @@ void td_right_skip(tap_dance_state_t *state, void *user_data) {
             SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_RIGHT) SS_UP(X_LCTL));
             break;
         default:
-            reset_tap_dance(state);
             break;
     }
 }
@@ -373,7 +371,6 @@ void td_next_tab(tap_dance_state_t *state, void *user_data) {
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
             SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_TAB) SS_UP(X_LCTL));
-
             break;
         default:
             break;
@@ -387,8 +384,11 @@ void td_home_prev(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_TAP:
             tap_code(KC_HOME);
             break;
-        case TD_SINGLE_HOLD:
+        case TD_DOUBLE_TAP:
             SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LALT) SS_TAP(X_LEFT) SS_UP(X_LALT) SS_UP(X_LCTL));
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_LEFT) SS_UP(X_LALT));
             break;
         default:
             break;
@@ -402,29 +402,32 @@ void td_end_next(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_TAP:
             tap_code(KC_END);
             break;
-        case TD_SINGLE_HOLD:
+        case TD_DOUBLE_TAP:
             SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LALT) SS_TAP(X_RIGHT) SS_UP(X_LALT) SS_UP(X_LCTL));
             break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_RIGHT) SS_UP(X_LALT));
         default:
             break;
     }
 }
+
 
 // defining one shot mod shift-ctrl-alt and next desktop tapdance key
 void td_osm_sft_ctl_alt(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
-            tap_code(OSM(MOD_LSFT));
+            set_oneshot_mods (MOD_LSFT);
             break;
         case TD_DOUBLE_TAP:
-            tap_code(OSM(MOD_LCTL));
+            set_oneshot_mods (MOD_LCTL);
             break;
         case TD_TRIPLE_TAP:
-            tap_code(OSM(MOD_LALT));
+            set_oneshot_mods (MOD_LALT);
             break;
         case TD_SINGLE_HOLD:
-            tap_code(OSM(MOD_LGUI));
+            set_oneshot_mods (MOD_LGUI);
             break;
         default:
             break;
