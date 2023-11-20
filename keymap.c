@@ -102,7 +102,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------                         --------------------------------------------
     TD(TD_APP_TAB), KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,                 TD(TD_LSKIP), KC_DOWN, KC_UP, TD(TD_RSKIP), KC_ENT,
     // ----------------------------------------                         --------------------------------------------
-    KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), KC_DEL,                KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
+    KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), TD(TD_DELETE),         KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------                         --------------------------------------------
                             TO(0), OSM(MOD_LSFT),                       KC_BTN1, TD(TD_OSM_SCAW)
     ),
@@ -291,11 +291,18 @@ void td_bspace(tap_dance_state_t *state, void *user_data) {
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
             tap_code(KC_BSPC);
-
+            break;
+        case TD_DOUBLE_TAP:
+            tap_code(KC_BSPC);
+            tap_code(KC_BSPC);
+            break;
+        case TD_TRIPLE_TAP:
+            tap_code(KC_BSPC);
+            tap_code(KC_BSPC);
+            tap_code(KC_BSPC);
             break;
         case TD_SINGLE_HOLD:
             SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_BSPC) SS_UP(X_LCTL));
-
             break;
         case TD_DOUBLE_HOLD:
             SEND_STRING(SS_DOWN(X_LSFT) SS_DOWN(X_HOME) SS_TAP(X_BSPC) SS_UP(X_LSFT) SS_UP(X_HOME));
@@ -327,10 +334,10 @@ void td_apptab_switch(tap_dance_state_t *state, void *user_data) {
             tap_code(KC_TAB);
             break;
         case TD_SINGLE_HOLD:
-            SEND_STRING(SS_TAP(X_LALT) SS_TAP(X_TAB) SS_TAP(X_LCTL));
+            SEND_STRING(SS_DOWN(X_LALT) SS_DOWN(X_LCTL) SS_TAP(X_TAB) SS_UP(X_LALT) SS_UP(X_LCTL) );
             break;
         case TD_DOUBLE_HOLD:
-            SEND_STRING(SS_TAP(X_LGUI) SS_TAP(X_TAB));
+            SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_TAB) SS_UP(X_LGUI));
 
             break;
         default:
@@ -339,14 +346,14 @@ void td_apptab_switch(tap_dance_state_t *state, void *user_data) {
 }
 
 // defining esc and task manager tapdance key
-void td_esc_tm(tap_dance_state_t *state, void *user_data) {
+    void td_esc_tm(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
             tap_code(KC_ESCAPE);
             break;
         case TD_DOUBLE_HOLD:
-            SEND_STRING(SS_TAP(X_LCTL) SS_TAP(X_LALT) SS_TAP(X_DEL));
+            SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LALT) SS_TAP(X_DEL) SS_UP(X_LCTL) SS_UP(X_LALT));
             break;
         default:
             break;
@@ -429,6 +436,10 @@ void td_osm_sft_ctl_alt(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_HOLD:
             set_oneshot_mods (MOD_LGUI);
             break;
+        case TD_DOUBLE_HOLD:
+            tap_code(KC_LGUI);
+            break;
+
         default:
             break;
     }
