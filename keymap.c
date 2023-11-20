@@ -56,7 +56,8 @@ enum {
     TD_ESC_TM,
     TD_NEXT_T,
     TD_PREV_T,
-    ALT_OSL1
+    ALT_OSL1,
+    TD_OSM_SCAW
 };
 
 // define the various layers
@@ -69,7 +70,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     //-----------------------------------------                         -----------------------------------------------
     KC_Z, KC_X , KC_C, KC_V, TD(TD_DELETE),                             KC_B, KC_N, KC_M, KC_COMM, KC_DOT,
     //-----------------------------------------                         -----------------------------------------------
-                        OSM(MOD_LSFT), KC_SPC,                          OSL(1), OSM(MOD_LCTL)
+                        OSM(MOD_LGUI), KC_SPC,                          OSL(1), TD(TD_OSM_SCAW)
     ),
 
     [1] = LAYOUT(
@@ -103,7 +104,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------                         --------------------------------------------
     KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), KC_DEL,                KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------                         --------------------------------------------
-                            TO(0), OSM(MOD_LSFT),                       KC_BTN1, OSM(MOD_LCTL)
+                            TO(0), OSM(MOD_LSFT),                       KC_BTN1, TD(TD_OSM_SCAW)
     ),
 
     [4] = LAYOUT(
@@ -409,6 +410,27 @@ void td_end_next(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+// defining one shot mod shift-ctrl-alt and next desktop tapdance key
+void td_osm_sft_ctl_alt(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(OSM(MOD_LSFT));
+            break;
+        case TD_DOUBLE_TAP:
+            tap_code(OSM(MOD_LCTL));
+            break;
+        case TD_TRIPLE_TAP:
+            tap_code(OSM(MOD_LALT));
+            break;
+        case TD_SINGLE_HOLD:
+            tap_code(OSM(MOD_LGUI));
+            break;
+        default:
+            break;
+    }
+}
+
 // Defining oneshot layer functions
 
 void alt_finished (tap_dance_state_t *state, void *user_data) {
@@ -474,7 +496,8 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_ESC_TM] = ACTION_TAP_DANCE_FN(td_esc_tm),
     [TD_NEXT_T] = ACTION_TAP_DANCE_FN(td_next_tab),
     [TD_PREV_T] = ACTION_TAP_DANCE_FN(td_prev_tab),
-    [ALT_OSL1]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset)
+    [ALT_OSL1]  = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
+    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN(td_osm_sft_ctl_alt)
 };
 
 // old code from here
