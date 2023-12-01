@@ -49,8 +49,6 @@ enum {
     TD_AA_DK,
     TD_OE_DK,
     TD_APP_TAB,
-    TD_LSKIP,
-    TD_RSKIP,
     TD_HOME_P,
     TD_END_N,
     TD_ESC_TM,
@@ -100,7 +98,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Navigation layer, from base layer 0-----                         --------------------------------------------
     TD(TD_ESC_TM), KC_WH_L, KC_MS_U, KC_WH_R, KC_WH_U,                  TD(TD_HOME_P), TD(TD_PREV_T), TD(TD_NEXT_T), TD(TD_END_N), TD(TD_BSPACE),
     // ----------------------------------------                         --------------------------------------------
-    TD(TD_APP_TAB), KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,                 TD(TD_LSKIP), KC_DOWN, KC_UP, TD(TD_RSKIP), KC_ENT,
+    TD(TD_APP_TAB), KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,                 KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT, KC_ENT,
     // ----------------------------------------                         --------------------------------------------
     KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), TD(TD_DELETE),         KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------                         --------------------------------------------
@@ -218,46 +216,12 @@ void td_oe(tap_dance_state_t *state, void *user_data) {
     }
 }
 
-// defining ae and enter tapdance
-void td_ae_enter(tap_dance_state_t *state, void *user_data) {
-    tap_state.state = dance_state(state);
-    switch (tap_state.state) {
-        case TD_SINGLE_TAP:
-            tap_code(KC_SCLN);
-            break;
-        case TD_DOUBLE_TAP:
-            tap_code(KC_ENT);
-            break;
-        default:
-            reset_tap_dance(state);
-            break;
-    }
-}
-
-// defining left arrow tapdance
-void td_left_skip(tap_dance_state_t *state, void *user_data) {
-    tap_state.state = dance_state(state);
-    switch (tap_state.state) {
-        case TD_SINGLE_TAP:
-            tap_code(KC_LEFT);
-            break;
-        case TD_SINGLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_LEFT) SS_UP(X_LCTL));
-            break;
-        default:
-            break;
-    }
-}
-
 // defining right arrow tapdance
 void td_right_skip(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
             tap_code(KC_RIGHT);
-            break;
-        case TD_SINGLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_RIGHT) SS_UP(X_LCTL));
             break;
         default:
             break;
@@ -370,14 +334,18 @@ void td_apptab_switch(tap_dance_state_t *state, void *user_data) {
     }
 }
 
-// defining previous tab tapdance key
-void td_prev_tab(tap_dance_state_t *state, void *user_data) {
+// defining ae and enter tapdance
+void td_ae_enter(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
-            SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LSFT) SS_TAP(X_TAB) SS_UP(X_LCTL) SS_UP(X_LSFT));
+            tap_code(KC_SCLN);
+            break;
+        case TD_DOUBLE_TAP:
+            tap_code(KC_ENT);
             break;
         default:
+            reset_tap_dance(state);
             break;
     }
 }
@@ -513,8 +481,6 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_AA_DK] = ACTION_TAP_DANCE_FN(td_aa),
     [TD_OE_DK] = ACTION_TAP_DANCE_FN(td_oe),
     [TD_APP_TAB] = ACTION_TAP_DANCE_FN(td_apptab_switch),
-    [TD_LSKIP] = ACTION_TAP_DANCE_FN(td_left_skip),
-    [TD_RSKIP] = ACTION_TAP_DANCE_FN(td_right_skip),
     [TD_HOME_P] = ACTION_TAP_DANCE_FN(td_home_prev),
     [TD_END_N] = ACTION_TAP_DANCE_FN(td_end_next),
     [TD_ESC_TM] = ACTION_TAP_DANCE_FN(td_esc_tm),
