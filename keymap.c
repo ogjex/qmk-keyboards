@@ -350,6 +350,18 @@ void td_ae_enter(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+// defining previous tab tapdance key
+void td_prev_tab(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LSFT) SS_TAP(X_TAB) SS_UP(X_LCTL) SS_UP(X_LSFT));
+            break;
+        default:
+            break;
+    }
+}
+
 // defining next tab tapdance key
 void td_next_tab(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
