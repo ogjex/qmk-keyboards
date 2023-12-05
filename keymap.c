@@ -458,6 +458,7 @@ void alt_reset (tap_dance_state_t *state, void *user_data) {
     case TD_DOUBLE_HOLD: layer_off(0); unregister_code(KC_LALT); break;
   }
   alttap_state.state = 0;
+
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
@@ -488,6 +489,10 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case TD(TD_OSM_SCAW):
       return 150;
+    case TD(TD_BSPACE):
+      return 50;
+    case TD(TD_DELETE):
+      return 50;
     default:
       return TAPPING_TERM;
   }
