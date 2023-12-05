@@ -102,7 +102,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ----------------------------------------                         --------------------------------------------
     KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), TD(TD_DELETE),         KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------                         --------------------------------------------
-                            TO(0), OSM(MOD_LSFT),                       KC_BTN1, TD(TD_OSM_SCAW)
+                            TO(0), KC_LSFT,                             KC_BTN1, TD(TD_OSM_SCAW)
     ),
 
     [4] = LAYOUT(
@@ -464,7 +464,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 
   switch (keycode) {
     case KC_TRNS:
-    case KC_NO:
+    case KC_NO
       /* Always cancel one-shot layer when another key gets pressed */
       if (record->event.pressed && is_oneshot_layer_active())
       clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
@@ -499,7 +499,7 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_NEXT_T] = ACTION_TAP_DANCE_FN(td_next_tab),
     [TD_PREV_T] = ACTION_TAP_DANCE_FN(td_prev_tab),
     [ALT_OSL1]  = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
-    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN(td_osm_sft_ctl_alt)
+    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td_osm_sft_ctl_alt, NULL, 150)
 };
 
 // old code from here
