@@ -128,6 +128,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 td_state_t dance_state(tap_dance_state_t *state);
 void alt_finished (tap_dance_state_t *state, void *user_data);
 void alt_reset (tap_dance_state_t *state, void *user_data);
+uint16_t get_tapping_term(uint16_t keycode);
 
 td_state_t dance_state(tap_dance_state_t *state) {
     if (state->count == 1) {
@@ -491,6 +492,7 @@ uint16_t get_tapping_term(uint16_t keycode) {
       return TAPPING_TERM;
   }
 }
+
 
 //Associate our tap dance key with its functionality
 tap_dance_action_t tap_dance_actions[] = {
