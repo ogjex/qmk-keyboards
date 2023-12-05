@@ -482,6 +482,15 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
+// define per key tapping term
+uint16_t get_tapping_term(uint16_t keycode) {
+  switch (keycode) {
+    case TD(TD_OSM_SCAW):
+      return 150;
+    default:
+      return TAPPING_TERM;
+  }
+}
 
 //Associate our tap dance key with its functionality
 tap_dance_action_t tap_dance_actions[] = {
@@ -499,7 +508,7 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_NEXT_T] = ACTION_TAP_DANCE_FN(td_next_tab),
     [TD_PREV_T] = ACTION_TAP_DANCE_FN(td_prev_tab),
     [ALT_OSL1]  = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
-    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td_osm_sft_ctl_alt, NULL, 150)
+    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN(td_osm_sft_ctl_alt)
 };
 
 // old code from here
