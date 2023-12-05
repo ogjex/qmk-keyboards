@@ -128,7 +128,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 td_state_t dance_state(tap_dance_state_t *state);
 void alt_finished (tap_dance_state_t *state, void *user_data);
 void alt_reset (tap_dance_state_t *state, void *user_data);
-uint16_t get_tapping_term(uint16_t keycode);
 
 td_state_t dance_state(tap_dance_state_t *state) {
     if (state->count == 1) {
@@ -465,11 +464,12 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 
   switch (keycode) {
     case KC_TRNS:
-    case KC_NO
+    case KC_NO:
       /* Always cancel one-shot layer when another key gets pressed */
-      if (record->event.pressed && is_oneshot_layer_active())
+      if (record->event.pressed && is_oneshot_layer_active()){
       clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
       return true;
+      }
     case QK_BOOTLOADER:
       /* Don't allow reset from oneshot layer state */
       if (record->event.pressed && is_oneshot_layer_active()){
@@ -484,7 +484,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 }
 
 // define per key tapping term
-uint16_t get_tapping_term(uint16_t keycode) {
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case TD(TD_OSM_SCAW):
       return 150;
