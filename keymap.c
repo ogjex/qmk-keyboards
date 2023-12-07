@@ -419,16 +419,16 @@ void td_osm_sft_ctl_alt(tap_dance_state_t *state, void *user_data) {
     tap_state.state = dance_state(state);
     switch (tap_state.state) {
         case TD_SINGLE_TAP:
-            set_oneshot_mods (MOD_LSFT);
+            set_oneshot_mods(MOD_LSFT);
             break;
         case TD_DOUBLE_TAP:
-            set_oneshot_mods (MOD_LCTL);
+            set_oneshot_mods(MOD_LCTL);
             break;
         case TD_TRIPLE_TAP:
-            set_oneshot_mods (MOD_LALT);
+            set_oneshot_mods(MOD_LALT);
             break;
         case TD_SINGLE_HOLD:
-            set_oneshot_mods (MOD_LGUI);
+            set_oneshot_mods(MOD_LGUI);
             break;
         case TD_DOUBLE_HOLD:
             tap_code(KC_LGUI);
@@ -446,7 +446,8 @@ void td_left_skip(tap_dance_state_t *state, void *user_data) {
             tap_code(KC_LEFT);
             break;
         case TD_SINGLE_HOLD:
-            SEND_STRING(SS_DOWN(X_LCTRL) SS_TAP(X_LEFT) SS_UP(X_LCTRL));
+            SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_LEFT) SS_UP(X_LCTL));
+
             break;
 
         default:
