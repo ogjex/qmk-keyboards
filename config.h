@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAPPING_TERM 200
 #define TAPPING_TERM_PER_KEYS
 #define DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD
+#define QUICK_TAP_TERM 120
 
 #undef MOUSEKEY_DELAY
 #define MOUSEKEY_DELAY 5

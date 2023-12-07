@@ -58,6 +58,8 @@ enum {
     TD_OSM_SCAW
 };
 
+uint16_t key_timer;
+
 // define the various layers
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
@@ -98,7 +100,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Navigation layer, from base layer 0-----                         --------------------------------------------
     TD(TD_ESC_TM), KC_WH_L, KC_MS_U, KC_WH_R, KC_WH_U,                  TD(TD_HOME_P), TD(TD_PREV_T), TD(TD_NEXT_T), TD(TD_END_N), TD(TD_BSPACE),
     // ----------------------------------------                         --------------------------------------------
-    TD(TD_APP_TAB), KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,                 KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT, KC_ENT,
+    TD(TD_APP_TAB), KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_D,                 TD(TD_LEFT_SKIP), KC_DOWN, KC_UP, KC_RIGHT, KC_ENT,
     // ----------------------------------------                         --------------------------------------------
     KC_BTN2, LCTL(KC_X), LCTL(KC_C), LCTL(KC_V), TD(TD_DELETE),         KC_ACL0, KC_ACL1, KC_ACL2, KC_PGDN, KC_PGUP,
     // ----------------------------------------                         --------------------------------------------
@@ -435,6 +437,21 @@ void td_osm_sft_ctl_alt(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+void td_left_skip(tap_dance_state_t *state, void *user_data) {
+    tap_state.state = dance_state(state);
+    switch (tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_LEFT);
+            break;
+        case TD_SINGLE_HOLD:
+            SEND_STRING(SS_DOWN(X_LCTRL) SS_TAP(X_LEFT) SS_UP(X_LCTRL));
+            break;
+
+        default:
+            break;
+    }
+}
+
 // Defining oneshot layer functions
 
 void alt_finished (tap_dance_state_t *state, void *user_data) {
@@ -462,7 +479,6 @@ void alt_reset (tap_dance_state_t *state, void *user_data) {
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
-
   switch (keycode) {
     case KC_TRNS:
     case KC_NO:
@@ -498,6 +514,14 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
   }
 }
 
+uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case TD(TD_LEFT_SKIP):
+            return QUICK_TAP_TERM - 20;
+        default:
+            return QUICK_TAP_TERM;
+    }
+}
 
 //Associate our tap dance key with its functionality
 tap_dance_action_t tap_dance_actions[] = {
@@ -515,7 +539,8 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_NEXT_T] = ACTION_TAP_DANCE_FN(td_next_tab),
     [TD_PREV_T] = ACTION_TAP_DANCE_FN(td_prev_tab),
     [ALT_OSL1]  = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
-    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN(td_osm_sft_ctl_alt)
+    [TD_OSM_SCAW] = ACTION_TAP_DANCE_FN(td_osm_sft_ctl_alt),
+    [TD_LEFT_SKIP] = ACTION_TAP_DANCE_FN(td_left_skip)
 };
 
 // old code from here
