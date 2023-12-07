@@ -55,7 +55,9 @@ enum {
     TD_NEXT_T,
     TD_PREV_T,
     ALT_OSL1,
-    TD_OSM_SCAW
+    TD_OSM_SCAW,
+    TD_LEFT_SKIP
+
 };
 
 uint16_t key_timer;
